@@ -1,0 +1,65 @@
+import os
+import fitz  
+import re
+from docx import Document
+from docx.shared import Inches
+
+# Function to extract text, candidate name, and picture
+def extract_data_from_pdf(pdf_path):
+    doc = fitz.open(pdf_path)
+    text = ""
+    for page_num in range(min(2, doc.page_count)):  # Read only the first page for efficiency
+        page = doc.load_page(page_num)
+        text += page.get_text("text")
+    doc.close()
+    
+    # Extract name and picture
+    name = re.search(r'^[A-Z\s]+$', text, re.MULTILINE)
+    picture = re.search(r'(?:^|\n)(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)', text)
+    
+    return text, name.group(0) if name else "Name not found", picture.group(0) if picture else "Picture not found"
+
+# Function to search for keywords in text
+def search_keywords_in_text(text, keywords):
+    found_keywords = {}
+    for keyword in keywords:
+        matches = re.findall(r'\b' + re.escape(keyword) + r'\b', text, re.IGNORECASE)
+        if matches:
+            found_keywords[keyword] = matches
+    return found_keywords
+
+# Main function to process all PDFs in a folder and save results in the 'Output' folder
+def process_pdfs_in_folder(folder_path, keywords):
+    output_folder = '../Output'
+    os.makedirs(output_folder, exist_ok=True)  # Create the 'Output' folder if it doesn't exist
+    result_doc_path = os.path.join(output_folder, 'CV_Search_Results.docx')  # Path for the output Word document
+
+    result_doc = Document()
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".pdf"):
+            pdf_path = os.path.join(folder_path, filename)
+            extracted_text, name, picture = extract_data_from_pdf(pdf_path)
+            keyword_matches = search_keywords_in_text(extracted_text, keywords)
+            
+            # Add results to the document
+            result_doc.add_heading(f"Candidate: {name}", level=1)
+            if picture != "Picture not found":
+                result_doc.add_picture(picture, width=Inches(2))
+            for keyword, matches in keyword_matches.items():
+                result_doc.add_paragraph(f"Keyword '{keyword}' found in the following lines:")
+                for match in matches:
+                    result_doc.add_paragraph(match)
+            result_doc.add_page_break()
+
+    result_doc.save(result_doc_path)  # Save the output Word document in the 'Output' folder
+
+
+# Input keywords to search
+keywords_input = input("Enter keywords to search (separated by commas): ")
+keywords = [keyword.strip() for keyword in keywords_input.split(',')]
+
+# Input folder path
+folder_path = "../PDFs"
+
+# Process PDFs in the folder
+process_pdfs_in_folder(folder_path, keywords)

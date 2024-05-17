@@ -1,0 +1,4 @@
+# PDFExtract for screening candidates from eJobs
+python-docx
+PyMuPDF
+
