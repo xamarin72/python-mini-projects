@@ -1,5 +1,6 @@
 PDFDataExtractor/Code/pdfextr/
-
+.DS_Store
+PDFDataExtractor/.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
