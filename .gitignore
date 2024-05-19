@@ -1,6 +1,7 @@
 PDFDataExtractor/Code/pdfextr/
 .DS_Store
 PDFDataExtractor/.DS_Store
+PY_Emergence/src/emergencesrc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
