@@ -5,6 +5,8 @@ This repository contains a collection of mini Python projects. Each project is c
 ## Project List
 
 - [Project 1](./PDFDataExtractor/Documentation/README.md): Description of project 1.
+- [Project 2](./PY_Emergence/docs/Full documentation.docx): Description of project 2.
+
 - ...
 
 ## Usage
